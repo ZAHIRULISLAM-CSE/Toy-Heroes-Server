@@ -55,6 +55,15 @@ async function run() {
       res.send(result);
     });
 
+    // get toys of a specific userSelect: 
+    app.get("/toy/:email", async (req, res) => {
+      const email = req.params.email;
+      const query={sellerEmail : email}
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    });
+
+
     //search with text
     app.get("/searchToys/:text", async (req, res) => {
       const text = req.params.text;
