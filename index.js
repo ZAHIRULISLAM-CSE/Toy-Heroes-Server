@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 require("dotenv").config();
 const app = express();
@@ -29,6 +29,11 @@ async function run() {
     // Send a ping to confirm a successful connection
     const toyCollection=client.db("toyDatabase").collection("toys");
 
+    const indexKey = {toyName:1};
+    const indexOptions = {name:"toyName"};
+    const result = await toyCollection.createIndex(indexKey, indexOptions);
+
+
     app.post("/addtoys",  async (req,res)=>{
           const toyData=req.body;
           console.log(toyData)
@@ -36,10 +41,29 @@ async function run() {
            res.send(result);
     })
 
+
     app.get("/alltoys",async(req,res)=>{
         const result= await toyCollection.find().limit(20).toArray();
         res.send(result);
     })
+
+    //getEach singleToy DEtails
+    app.get("/toys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query={_id : new ObjectId(id)}
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //search with text
+    app.get("/searchToys/:text", async (req, res) => {
+      const text = req.params.text;
+      const query={
+          toyName: { $regex: text, $options: "i" }
+      }
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    });
 
 
     await client.db("admin").command({ ping: 1 });
