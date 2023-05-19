@@ -64,20 +64,9 @@ async function run() {
     });
 
     //get toys by catagory
-    app.get("/avengers", async (req, res) => {
-      const query={toyCatagory : "Avengers"}
-      const result = await toyCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    app.get("/starwars", async (req, res) => {
-      const query={toyCatagory : "Star Wars"}
-      const result = await toyCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    app.get("/transformers", async (req, res) => {
-      const query={toyCatagory : "Transformars"}
+    app.get("/catagory/:text", async (req, res) => {
+      const text=req.params.text;
+      const query={toyCatagory :text}
       const result = await toyCollection.find(query).toArray();
       res.send(result);
     });
