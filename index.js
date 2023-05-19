@@ -63,6 +63,25 @@ async function run() {
       res.send(result);
     });
 
+    //get toys by catagory
+    app.get("/avengers", async (req, res) => {
+      const query={toyCatagory : "Avengers"}
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/starwars", async (req, res) => {
+      const query={toyCatagory : "Star Wars"}
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/transformers", async (req, res) => {
+      const query={toyCatagory : "Transformars"}
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    });
+
 
     //search with text
     app.get("/searchToys/:text", async (req, res) => {
