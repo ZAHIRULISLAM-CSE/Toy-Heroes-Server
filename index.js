@@ -26,19 +26,14 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // Send a ping to confirm a successful connection
+
     const toyCollection = client.db("toyDatabase").collection("toys");
 
-    const indexKey = { toyName: 1 };
-    const indexOptions = { name: "toyName" };
-    const result = await toyCollection.createIndex(indexKey, indexOptions);
+    // const indexKey = { toyName: 1 };
+    // const indexOptions = { name: "toyName" };
+    // const result = await toyCollection.createIndex(indexKey, indexOptions);
 
-    app.post("/addtoys", async (req, res) => {
-      const toyData = req.body;
-      console.log(toyData);
-      const result = await toyCollection.insertOne(toyData);
-      res.send(result);
-    });
-
+    //get all data
     app.get("/alltoys", async (req, res) => {
       const result = await toyCollection.find().limit(20).toArray();
       res.send(result);
@@ -56,25 +51,26 @@ async function run() {
     app.get("/toy/:email", async (req, res) => {
       const email = req.params.email;
       const queryParams = req.query.price;
-      const query={sellerEmail : email}
+      const query = { sellerEmail: email };
       let store = [
         { $match: query },
         {
           $addFields: {
-            toyPriceNumeric: { $toInt: "$toyPrice" } 
-          }
-        }
+            toyPriceNumeric: { $toInt: "$toyPrice" },
+          },
+        },
       ];
       if (queryParams) {
-        console.log("okk")
-        store.push({ $sort: { toyPriceNumeric: queryParams === "asc" ? 1 : -1 } }); 
+        console.log("okk");
+        store.push({
+          $sort: { toyPriceNumeric: queryParams === "asc" ? 1 : -1 },
+        });
       }
       const result = await toyCollection.aggregate(store).toArray();
-      res.send(result );
-      
+      res.send(result);
     });
 
-    //get toys by catagory
+    //get toys by category
     app.get("/catagory/:text", async (req, res) => {
       const text = req.params.text;
       const query = { toyCatagory: text };
@@ -92,8 +88,15 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/addtoys", async (req, res) => {
+      const toyData = req.body;
+      console.log(toyData);
+      const result = await toyCollection.insertOne(toyData);
+      res.send(result);
+    });
+
     //update toyData
-    app.put("/update", async (res, req) => {
+    app.patch("/update", async (res, req) => {
       const updatedData = res.body;
       const id = updatedData.id;
       const price = updatedData.toyPrice;
@@ -120,7 +123,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
